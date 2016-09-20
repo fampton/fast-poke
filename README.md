@@ -1,2 +1,2 @@
 Usage:
-python fast_check.py <work|cps|home>
+python fast_check.py work
