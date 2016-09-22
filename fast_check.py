@@ -67,13 +67,15 @@ mygps = str(mylat)+','+str(mylong)
 
 # list of missing pokemon as of 16Sep
 missing_poke = [
-  3, 5, 6, 9, 15, 26, 31, 34, 36, 38, 40, 49, 51, 55, 57, 59, 62, 65, 67, 68, 71, 73, 76, 78, 83, 87, 89, 97, 101, 105, 106, 107, 108, 110, 112, 115, 122, 125, 130, 131, 132, 134, 135, 136, 139, 140, 141, 142, 143, 144, 145, 146
+  3, 6, 9, 15, 26, 31, 34, 36, 38, 40, 49, 51, 55, 57, 59, 62, 65, 67, 68, 71, 73, 76, 83, 87, 89, 97, 101, 105, 106, 108, 112, 115, 122, 125, 130, 131, 132, 134, 135, 136, 139, 140, 141, 142, 143, 144, 145, 146
 ]
 
 # Pokedex name/number map
 pokedex = {
-  'Abra': 63, 'Aerodactyl': 142, 'Alakazam': 65, 'Arbok': 24, 'Arcanine': 59, 'Articuno': 144, 'Beedrill': 15, 'Bellsprout': 69, 'Blastoise': 9, 'Bulbasaur': 1, 'Butterfree': 12, 'Caterpie': 10, 'Chansey': 113, 'Charizard': 6, 'Charmander': 4, 'Charmeleon': 5, 'Clefable': 36, 'Clefairy': 35, 'Cloyster': 91, 'Cubone': 104, 'Dewgong': 87, 'Diglett': 50, 'Ditto': 132, 'Dodrio': 85, 'Doduo': 84, 'Dragonair': 148, 'Dragonite': 149, 'Dratini': 147, 'Drowzee': 96, 'Dugtrio': 51, 'Eevee': 133, 'Ekans': 23, 'Electabuzz': 125, 'Electrode': 101, 'Exeggcute': 102, 'Exeggutor': 103, "Farfetch'd": 83, 'Fearow': 22, 'Flareon': 136, 'Gastly': 92, 'Gengar': 94, 'Geodude': 74, 'Gloom': 44, 'Golbat': 42, 'Goldeen': 118, 'Golduck': 55, 'Golem': 76, 'Graveler': 75, 'Grimer': 88, 'Growlithe': 58, 'Gyarados': 130, 'Haunter': 93, 'Hitmonchan': 107, 'Hitmonlee': 106, 'Horsea': 116, 'Hypno': 97, 'Ivysaur': 2, 'Jigglypuff': 39, 'Jolteon': 135, 'Jynx': 124, 'Kabuto': 140, 'Kabutops': 141, 'Kadabra': 64, 'Kakuna': 14, 'Kangaskhan': 115, 'Kingler': 99, 'Koffing': 109, 'Krabby': 98, 'Lapras': 131, 'Lickitung': 108, 'Machamp': 68, 'Machoke': 67, 'Machop': 66, 'Magikarp': 129, 'Magmar': 126, 'Magnemite': 81, 'Magneton': 82, 'Mankey': 56, 'Marowak': 105, 'Meowth': 52, 'Metapod': 11, 'Moltres': 146, 'Mr.': 122, 'Muk': 89, 'Nidoking': 34, 'Nidoqueen': 31, 'Nidoran_Male': 29, 'Nidoran_Female': 32, 'Nidorina': 30, 'Nidorino': 33, 'Ninetales': 38, 'Oddish': 43, 'Omanyte': 138, 'Omastar': 139, 'Onix': 95, 'Paras': 46, 'Parasect': 47, 'Persian': 53, 'Pidgeot': 18, 'Pidgeotto': 17, 'Pidgey': 16, 'Pikachu': 25, 'Pinsir': 127, 'Poliwag': 60, 'Poliwhirl': 61, 'Poliwrath': 62, 'Ponyta': 77, 'Porygon': 137, 'Primeape': 57, 'Psyduck': 54, 'Raichu': 26, 'Rapidash': 78, 'Raticate': 20, 'Rattata': 19, 'Rhydon': 112, 'Rhyhorn': 111, 'Sandshrew': 27, 'Sandslash': 28, 'Scyther': 123, 'Seadra': 117, 'Seaking': 119, 'Seel': 86, 'Shellder': 90, 'Slowbro': 80, 'Slowpoke': 79, 'Snorlax': 143, 'Spearow': 21, 'Squirtle': 7, 'Starmie': 121, 'Staryu': 120, 'Tangela': 114, 'Tauros': 128, 'Tentacool': 72, 'Tentacruel': 73, 'Vaporeon': 134, 'Venomoth': 49, 'Venonat': 48, 'Venusaur': 3, 'Victreebel': 71, 'Vileplume': 45, 'Voltorb': 100, 'Vulpix': 37, 'Wartortle': 8, 'Weedle': 13, 'Weepinbell': 70, 'Weezing': 110, 'Wigglytuff': 40, 'Zapdos': 145, 'Zubat': 41
+  'Abra': 63, 'Aerodactyl': 142, 'Alakazam': 65, 'Arbok': 24, 'Arcanine': 59, 'Articuno': 144, 'Beedrill': 15, 'Bellsprout': 69, 'Blastoise': 9, 'Bulbasaur': 1, 'Butterfree': 12, 'Caterpie': 10, 'Chansey': 113, 'Charizard': 6, 'Charmander': 4, 'Charmeleon': 5, 'Clefable': 36, 'Clefairy': 35, 'Cloyster': 91, 'Cubone': 104, 'Dewgong': 87, 'Diglett': 50, 'Ditto': 132, 'Dodrio': 85, 'Doduo': 84, 'Dragonair': 148, 'Dragonite': 149, 'Dratini': 147, 'Drowzee': 96, 'Dugtrio': 51, 'Eevee': 133, 'Ekans': 23, 'Electabuzz': 125, 'Electrode': 101, 'Exeggcute': 102, 'Exeggutor': 103, "Farfetch'd": 83, 'Fearow': 22, 'Flareon': 136, 'Gastly': 92, 'Gengar': 94, 'Geodude': 74, 'Gloom': 44, 'Golbat': 42, 'Goldeen': 118, 'Golduck': 55, 'Golem': 76, 'Graveler': 75, 'Grimer': 88, 'Growlithe': 58, 'Gyarados': 130, 'Haunter': 93, 'Hitmonchan': 107, 'Hitmonlee': 106, 'Horsea': 116, 'Hypno': 97, 'Ivysaur': 2, 'Jigglypuff': 39, 'Jolteon': 135, 'Jynx': 124, 'Kabuto': 140, 'Kabutops': 141, 'Kadabra': 64, 'Kakuna': 14, 'Kangaskhan': 115, 'Kingler': 99, 'Koffing': 109, 'Krabby': 98, 'Lapras': 131, 'Lickitung': 108, 'Machamp': 68, 'Machoke': 67, 'Machop': 66, 'Magikarp': 129, 'Magmar': 126, 'Magnemite': 81, 'Magneton': 82, 'Mankey': 56, 'Marowak': 105, 'Meowth': 52, 'Metapod': 11, 'Moltres': 146, 'Mr.Mime': 122, 'Muk': 89, 'Nidoking': 34, 'Nidoqueen': 31, 'Nidoran_Male': 29, 'Nidoran_Female': 32, 'Nidorina': 30, 'Nidorino': 33, 'Ninetales': 38, 'Oddish': 43, 'Omanyte': 138, 'Omastar': 139, 'Onix': 95, 'Paras': 46, 'Parasect': 47, 'Persian': 53, 'Pidgeot': 18, 'Pidgeotto': 17, 'Pidgey': 16, 'Pikachu': 25, 'Pinsir': 127, 'Poliwag': 60, 'Poliwhirl': 61, 'Poliwrath': 62, 'Ponyta': 77, 'Porygon': 137, 'Primeape': 57, 'Psyduck': 54, 'Raichu': 26, 'Rapidash': 78, 'Raticate': 20, 'Rattata': 19, 'Rhydon': 112, 'Rhyhorn': 111, 'Sandshrew': 27, 'Sandslash': 28, 'Scyther': 123, 'Seadra': 117, 'Seaking': 119, 'Seel': 86, 'Shellder': 90, 'Slowbro': 80, 'Slowpoke': 79, 'Snorlax': 143, 'Spearow': 21, 'Squirtle': 7, 'Starmie': 121, 'Staryu': 120, 'Tangela': 114, 'Tauros': 128, 'Tentacool': 72, 'Tentacruel': 73, 'Vaporeon': 134, 'Venomoth': 49, 'Venonat': 48, 'Venusaur': 3, 'Victreebel': 71, 'Vileplume': 45, 'Voltorb': 100, 'Vulpix': 37, 'Wartortle': 8, 'Weedle': 13, 'Weepinbell': 70, 'Weezing': 110, 'Wigglytuff': 40, 'Zapdos': 145, 'Zubat': 41
 }
+
+revpokedex = dict((v,k) for k,v in pokedex.iteritems())
 
 # Configure redis connection
 r = redis.StrictRedis(host='localhost', port=6379, db=1)
@@ -96,8 +98,11 @@ def get_data(mylat, mylong):
 # parse list for pokemon names mapped from pokedex dict
 def list_nearby(mylist):
   print 'Nearby Pokemon:'+'\n'
+  list_for_counting = []
   for i in mylist:
-    print i['pokemon_id']
+    list_for_counting.append(i['pokemon_id'])
+  for i in set(list_for_counting):
+    print i, list_for_counting.count(i)
 
 # check nearby pokemon for any that I do not have
 def check_for_missing(mylist):
@@ -118,7 +123,7 @@ def check_for_missing(mylist):
         r.expire(i['encounter_id'], poke_time_left(i))
     else:
       pass
-    return mypokelist
+  return mypokelist
 
 def gmap_url(mypokemon):
   mylat = mypokemon['lnglat']['coordinates'][1]
@@ -162,11 +167,11 @@ def get_walking_time(mypokemon):
 
 def main():
   mydata = get_data(mylat, mylong)
+  list_nearby(mydata)
   mycheck = check_for_missing(mydata)
+  print mycheck
   for i in mycheck:
     print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4] 
-  if myloc == 'home':
-    list_nearby(mydata)
 
 if __name__ == '__main__':
 	main()
