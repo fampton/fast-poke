@@ -67,7 +67,7 @@ mygps = str(mylat)+','+str(mylong)
 
 # list of missing pokemon as of 16Sep
 missing_poke = [
-  3, 6, 9, 15, 26, 31, 34, 36, 38, 40, 49, 51, 55, 57, 59, 62, 65, 67, 68, 71, 73, 76, 83, 87, 89, 97, 101, 105, 106, 108, 112, 115, 122, 125, 130, 131, 132, 134, 135, 136, 139, 140, 141, 142, 143, 144, 145, 146
+  3, 6, 9, 15, 26, 31, 34, 36, 38, 40, 49, 51, 55, 57, 59, 62, 65, 67, 68, 71, 73, 76, 83, 87, 89, 97, 105, 106, 108, 112, 115, 122, 125, 130, 131, 132, 134, 135, 136, 139, 140, 141, 142, 143, 144, 145, 146
 ]
 
 # Pokedex name/number map
@@ -118,7 +118,7 @@ def check_for_missing(mylist):
         pass
       else:
         #print 'Found NEW one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'Walking duration', mydistance
-        mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance))
+        mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance, 'new'))
         r.set(i['encounter_id'], i['lnglat']['coordinates'])
         r.expire(i['encounter_id'], poke_time_left(i))
     else:
@@ -171,7 +171,11 @@ def main():
   mycheck = check_for_missing(mydata)
   print mycheck
   for i in mycheck:
-    print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4] 
+    if 'new' in i:
+      print 'Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4]
+      message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
+    else:
+      print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4] 
 
 if __name__ == '__main__':
 	main()
