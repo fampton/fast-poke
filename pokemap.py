@@ -15,9 +15,6 @@ class Error(Exception):
   pass
 
 class Pokemap(object):
-  def __init__(self):
-    pass
-
   def build_coord_url(self, lat, lng):
     url = list(urlparse.urlsplit("https://cache.fastpokemap.se/"))
 
@@ -64,5 +61,3 @@ class Pokemap(object):
     headers = self.build_headers()
     resp = requests.get(url, cookies=cookies, headers=headers)
     return resp.json()
-
-

@@ -3,6 +3,7 @@
 import ast
 import datetime
 import iso8601
+import itertools
 import json
 import redis
 import requests
@@ -10,8 +11,8 @@ import sys
 
 # import api configs
 import config
+import pokemap
 
-from time import sleep
 from twilio.rest import TwilioRestClient
 
 #import gapi_key
@@ -24,15 +25,6 @@ authToken = config.twilio_token
 twilioCli = TwilioRestClient(accountSID, authToken)
 myTwilioNumber = config.myTwilioNumber
 myCellPhone = config.myCellPhone
-
-accept = 'application/json, text/javascript, */*; q=0.01'
-connection = 'keep-alive'
-host = 'cache.fastpokemap.se'
-origin = 'https://fastpokemap.se'
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'
-
-myheaders = {'Host': host, 'User-Agent': user_agent, 'origin': origin, 'Accept': accept, 'Connection': connection}
-mycookies = {'__cfduid':'defc59e78e21e3acea19f00c04bbbccb91473965777', 'path':'/', 'domain':'.fastpokemap.se', 'httpOnly': 'true'}
 
 # work gps
 unsq = (40.735457, -73.991786)
@@ -85,48 +77,42 @@ r = redis.StrictRedis(host='localhost', port=6379, db=1)
 # make request to fastpokemap api
 # returns list (in string form) of pokemon objects as seen in example above
 def get_data(mylat, mylong):
-  myget = requests.get('https://cache.fastpokemap.se/?key=allow-all&ts=0&compute=100.38.165.58&lat={}&lng={}'.format(mylat,mylong), headers=myheaders, cookies=mycookies)
-  unsq = myget.content
-  if myget.status_code != 200:
-    print "Server down!"
-    sys.exit(1)
-  # convert returned string to list
-  unsq = ast.literal_eval(unsq)
-  return unsq
+  client = pokemap.Pokemap()
+  return client.search_coord(mylat, mylong)
 
 # parse list for pokemon names mapped from pokedex dict
 def list_nearby(mylist):
+  sort_by = lambda x: x.pokemon_id
+  xs = sorted(mylist, key=sort_by)
+
   print 'Nearby Pokemon:'+'\n'
-  list_for_counting = []
-  for i in mylist:
-    list_for_counting.append(i['pokemon_id'])
-  for i in set(list_for_counting):
-    print i, list_for_counting.count(i)
+  for value, group in itertools.groupby(xs, lambda x: x.pokemon_id):
+    print value, len(list(group))
 
 # check nearby pokemon for any that I do not have
 def check_for_missing(mylist):
   mypokelist = []
   for i in mylist:
     # because my missing poke list is by id and the data we get from fastpokemaps.se gives names we lookup number via mapping
-    if pokedex[i['pokemon_id'].title()] in missing_poke:
+    if pokedex[i.pokemon_id.title()] in missing_poke:
       mydistance = get_walking_time(i)
       # check redis to see if we have already seen this poke, so that we don't send sms for previous pokemon
-      if r.exists(i['encounter_id']):
-        #print 'Found one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
-        mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance))
+      if r.exists(i.encounter_id):
+        #print 'Found one!', i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
+        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), poke_time_left(i), mydistance))
         pass
       else:
-        #print 'Found NEW one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
-        mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance, 'new'))
-        r.set(i['encounter_id'], i['lnglat']['coordinates'])
-        r.expire(i['encounter_id'], poke_time_left(i))
+        #print 'Found NEW one!', i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
+        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), poke_time_left(i), mydistance, 'new'))
+        r.set(i.encounter_id, i.coordinates)
+        r.expire(i.encounter_id, poke_time_left(i))
     else:
       pass
   return mypokelist
 
 def gmap_url(mypokemon):
-  mylat = mypokemon['lnglat']['coordinates'][1]
-  mylng = mypokemon['lnglat']['coordinates'][0]
+  mylat = mypokemon.coordinates[1]
+  mylng = mypokemon.coordinates[0]
   return 'http://www.google.com/maps/place/{},{}'.format(mylat, mylng)
 
 
@@ -140,7 +126,7 @@ def duration_until(expire_at):
     return datetime.timedelta()
 
 def poke_time_left(mypokemon):
-  duration = duration_until(mypokemon['expireAt'])
+  duration = duration_until(mypokemon.expire_at)
   return duration.seconds
 
 def send_sms(poke_id, mypokemon, myexpiry):
@@ -151,8 +137,8 @@ def send_sms(poke_id, mypokemon, myexpiry):
 #gapi response json
 #jq '.routes[0] .legs[0] .duration.value'
 def get_walking_time(mypokemon):
-  mylat = mypokemon['lnglat']['coordinates'][1]
-  mylng = mypokemon['lnglat']['coordinates'][0]
+  mylat = mypokemon.coordinates[1]
+  mylng = mypokemon.coordinates[0]
   mycoords = str(mylat)+','+str(mylng)
   mydir_payload = {
     'origin': mygps,
