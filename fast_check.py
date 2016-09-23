@@ -11,7 +11,6 @@ import sys
 # import api configs
 import config
 
-from pytz import timezone
 from time import sleep
 from twilio.rest import TwilioRestClient
 
@@ -83,7 +82,7 @@ r = redis.StrictRedis(host='localhost', port=6379, db=1)
 # Example poke object
 # {"pokemon_id":"PIDGEY","lnglat":{"type":"Point","coordinates":[-73.99195579345653,40.73548518715059]},"encounter_id":"8900503607140605597","spawn_id":"89c25998605","expireAt":"2016-09-15T21:22:25.844+02:00"}
 
-# make request to fastpokemap api 
+# make request to fastpokemap api
 # returns list (in string form) of pokemon objects as seen in example above
 def get_data(mylat, mylong):
   myget = requests.get('https://cache.fastpokemap.se/?key=allow-all&ts=0&compute=100.38.165.58&lat={}&lng={}'.format(mylat,mylong), headers=myheaders, cookies=mycookies)
@@ -109,15 +108,15 @@ def check_for_missing(mylist):
   mypokelist = []
   for i in mylist:
     # because my missing poke list is by id and the data we get from fastpokemaps.se gives names we lookup number via mapping
-    if pokedex[i['pokemon_id'].title()] in missing_poke:         
+    if pokedex[i['pokemon_id'].title()] in missing_poke:
       mydistance = get_walking_time(i)
       # check redis to see if we have already seen this poke, so that we don't send sms for previous pokemon
       if r.exists(i['encounter_id']):
-        #print 'Found one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'Walking duration', mydistance
+        #print 'Found one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
         mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance))
         pass
       else:
-        #print 'Found NEW one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'Walking duration', mydistance
+        #print 'Found NEW one!', i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
         mypokelist.append((i['pokemon_id'], pokedex[i['pokemon_id'].title()], gmap_url(i), poke_time_left(i), mydistance, 'new'))
         r.set(i['encounter_id'], i['lnglat']['coordinates'])
         r.expire(i['encounter_id'], poke_time_left(i))
@@ -130,17 +129,19 @@ def gmap_url(mypokemon):
   mylng = mypokemon['lnglat']['coordinates'][0]
   return 'http://www.google.com/maps/place/{},{}'.format(mylat, mylng)
 
-def poke_time_left(mypokemon):
-  # convert response date string to datetime object
-  parsed_datetime = iso8601.parse_date(mypokemon['expireAt'])
-  # convert to est
-  tz = timezone('US/Eastern')
-  #get timedelta between now and poke expiry
-  time_left = parsed_datetime.astimezone(timezone('US/Eastern')) - tz.localize(datetime.datetime.now())
-  if time_left.total_seconds() > 0:
-    return time_left
+
+def duration_until(expire_at):
+  expire_dt  = iso8601.parse_date(expire_at)
+  current_dt = datetime.datetime.now(expire_dt.tzinfo)
+
+  if current_dt < expire_dt:
+    return expire_dt - current_dt
   else:
-    return 0
+    return datetime.timedelta()
+
+def poke_time_left(mypokemon):
+  duration = duration_until(mypokemon['expireAt'])
+  return duration.seconds
 
 def send_sms(poke_id, mypokemon, myexpiry):
   # should combine poke_id, mypokemon and myexpiry to be sourced from one object
@@ -169,13 +170,12 @@ def main():
   mydata = get_data(mylat, mylong)
   list_nearby(mydata)
   mycheck = check_for_missing(mydata)
-  print mycheck
   for i in mycheck:
     if 'new' in i:
-      print 'Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4]
+      print 'Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4]
       message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
     else:
-      print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'Walking duration', i[4] 
+      print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4]
 
 if __name__ == '__main__':
 	main()
