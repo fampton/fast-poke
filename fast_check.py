@@ -98,11 +98,9 @@ def check_for_missing(mylist):
       mydistance = get_walking_time(i)
       # check redis to see if we have already seen this poke, so that we don't send sms for previous pokemon
       if r.exists(i.encounter_id):
-        #print 'Found one!', i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
         mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), poke_time_left(i), mydistance))
         pass
       else:
-        #print 'Found NEW one!', i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), 'expires in', poke_time_left(i), 'seconds. Walking duration', mydistance
         mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i), poke_time_left(i), mydistance, 'new'))
         r.set(i.encounter_id, i.coordinates)
         r.expire(i.encounter_id, poke_time_left(i))
@@ -147,7 +145,8 @@ def get_walking_time(mypokemon):
     'key': gapi_key
   }
   mydirections = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=mydir_payload)
-  # origin=40.735457,-73.991786&destination=40.7311384477,-73.9863545665&mode=walking&key=AIzaSyA0YuwjD8ceO7fEyki2TP-3UQbcZqfrKuA
+  # example query string for google maps api
+  # origin=40.735457,-73.991786&destination=40.7311384477,-73.9863545665&mode=walking&key=<gmaps api key>
   myduration = mydirections.json()['routes'][0]['legs'][0]['duration']['value']
   # convert time from seconds to minutes
   return myduration/60
