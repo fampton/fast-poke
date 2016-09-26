@@ -1,4 +1,3 @@
-import collections
 import requests
 import urllib
 import urlparse

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import ast
 import datetime
 import iso8601
 import itertools
