@@ -3,14 +3,13 @@
 import datetime
 import iso8601
 import itertools
-import json
 import redis
-import requests
 import sys
 
 # import api configs
 import config
 import pokemap
+import maps
 
 from twilio.rest import TwilioRestClient
 
@@ -53,7 +52,6 @@ elif sys.argv[1] == 'home':
   mylat = bshwk_home[0]
   mylong = bshwk_home[1]
   myloc = 'home'
-mygps = str(mylat)+','+str(mylong)
 
 # list of missing pokemon as of 16Sep
 missing_poke = [
@@ -133,21 +131,11 @@ def send_sms(poke_id, mypokemon, myexpiry):
 #gapi response json
 #jq '.routes[0] .legs[0] .duration.value'
 def get_walking_time(mypokemon):
-  mylat = mypokemon.coordinates[1]
-  mylng = mypokemon.coordinates[0]
-  mycoords = str(mylat)+','+str(mylng)
-  mydir_payload = {
-    'origin': mygps,
-    'destination': mycoords,
-    'mode': 'walking',
-    'key': gapi_key
-  }
-  mydirections = requests.get('https://maps.googleapis.com/maps/api/directions/json', params=mydir_payload)
-  # example query string for google maps api
-  # origin=40.735457,-73.991786&destination=40.7311384477,-73.9863545665&mode=walking&key=<gmaps api key>
-  myduration = mydirections.json()['routes'][0]['legs'][0]['duration']['value']
-  # convert time from seconds to minutes
-  return myduration/60
+  maps_client = maps.Client(gapi_key)
+  coord = mypokemon.coordinates
+  duration = maps_client.duration((mylat, mylong), (coord[1], coord[0]))
+
+  return duration / 60
 
 def main():
   mydata = get_data(mylat, mylong)

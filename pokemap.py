@@ -24,6 +24,8 @@ class Error(Exception):
   pass
 
 def search_coord(lat, lng):
+  url = list(urlparse.urlsplit("https://cache.fastpokemap.se/"))
+
   query_string = urllib.urlencode({
     "key": "allow-all",
     "ts": "0",
@@ -32,7 +34,6 @@ def search_coord(lat, lng):
     "lng": ("%.6f" % lng),
   })
 
-  url    = list(urlparse.urlsplit("https://cache.fastpokemap.se/"))
   url[3] = query_string
   url    = urlparse.urlunsplit(url)
 
