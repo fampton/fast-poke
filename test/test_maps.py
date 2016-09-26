@@ -14,30 +14,6 @@ class ResponseMock(object):
                 "value": 159
               }
             },
-            {
-              "duration": {
-                "text": "7 mins",
-                "value": 449
-              }
-            },
-            {
-              "duration": {
-                "text": "36 mins",
-                "value": 2179
-              }
-            },
-            {
-              "duration": {
-                "text": "1 min",
-                "value": 25
-              }
-            },
-            {
-              "duration": {
-                "text": "47 mins",
-                "value": 2812
-              }
-            }
           ]
         }
       ]
@@ -55,4 +31,4 @@ class MapsTestCase(unittest.TestCase):
     duration = maps_client.duration((40.735457, -73.991786),
                                     (40.764924, -73.972988))
 
-    self.assertEqual(duration, 5624)
+    self.assertEqual(duration, 159)

@@ -24,6 +24,4 @@ class Client(object):
     resp.raise_for_status()
     resp = resp.json()
 
-    legs = resp["routes"][0]["legs"]
-
-    return sum(leg["duration"]["value"] for leg in legs)
+    return resp["routes"][0]["legs"][0]["duration"]["value"]
