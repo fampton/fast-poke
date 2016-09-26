@@ -1,14 +1,24 @@
+import collections
 import requests
 import urllib
 import urlparse
 
-class ResultSet(object):
-  def __init__(self, result):
-    self.coordinates  = result["lnglat"]["coordinates"]
-    self.encounter_id = result["encounter_id"]
-    self.expire_at    = result["expireAt"]
-    self.pokemon_id   = result["pokemon_id"]
-    self.spawn_id     = result["spawn_id"]
+ResultSet = collections.namedtuple("ResultSet", [
+  "coordinates",
+  "encounter_id",
+  "expire_at",
+  "pokemon_id",
+  "spawn_id"
+])
+
+def dict_to_result_set(data):
+  return ResultSet(
+    data["lnglat"]["coordinates"],
+    data["encounter_id"],
+    data["expireAt"],
+    data["pokemon_id"],
+    data["spawn_id"]
+  )
 
 class Error(Exception):
   pass
@@ -37,4 +47,4 @@ def search_coord(lat, lng):
     if "error" in resp:
       raise Error(resp["error"])
 
-  return [ResultSet(r) for r in resp]
+  return [dict_to_result_set(r) for r in resp]
