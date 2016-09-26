@@ -34,14 +34,11 @@ class ErrorResponseMock(object):
 
 
 class PokemapTestCase(unittest.TestCase):
-  def setUp(self):
-    self.pokemap = pokemap.Pokemap()
-
   @mock.patch("pokemap.requests.get")
   def test_search_coord(self, get_mock):
     get_mock.return_value = ResponseMock()
 
-    resp  = self.pokemap.search_coord(40.764924, -73.972988)
+    resp  = pokemap.search_coord(40.764924, -73.972988)
     first = resp[0]
     self.assertEqual(first.coordinates,  [-73.973064,40.764799])
     self.assertEqual(first.encounter_id, "1823752155")
@@ -55,7 +52,6 @@ class PokemapTestCase(unittest.TestCase):
     get_mock.return_value = ErrorResponseMock()
 
     with self.assertRaises(pokemap.Error) as ctx:
-      resp = self.pokemap.search_coord(40.764924, -73.972988)
+      resp = pokemap.search_coord(40.764924, -73.972988)
 
     self.assertEqual(str(ctx.exception), "Something went wrong")
-

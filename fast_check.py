@@ -77,8 +77,7 @@ r = redis.StrictRedis(host='localhost', port=6379, db=1)
 # make request to fastpokemap api
 # returns list (in string form) of pokemon objects as seen in example above
 def get_data(mylat, mylong):
-  client = pokemap.Pokemap()
-  return client.search_coord(mylat, mylong)
+  return pokemap.search_coord(mylat, mylong)
 
 # parse list for pokemon names mapped from pokedex dict
 def list_nearby(mylist):
