@@ -112,6 +112,7 @@ def poke_time_left(mypokemon):
   duration = duration_until(mypokemon.expire_at)
   return duration.seconds
 
+# currently unused
 def send_sms(poke_id, mypokemon, myexpiry):
   # should combine poke_id, mypokemon and myexpiry to be sourced from one object
   message = twilioCli.messages.create(body='{} at {} expiring at {}'.format(poke_id, gmap_url(mypokemon), myexpiry), from_=myTwilioNumber, to=myCellPhone)
@@ -133,7 +134,9 @@ def main():
   for i in mycheck:
     if 'new' in i:
       print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
-      message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
+      if args.notify:
+        # replace this with a call to the send_sms() function
+        message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
     else:
       print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
 
