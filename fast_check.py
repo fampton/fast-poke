@@ -65,7 +65,8 @@ pokedex = {
 revpokedex = dict((v,k) for k,v in pokedex.iteritems())
 
 # Configure redis connection
-r = redis.StrictRedis(host='localhost', port=6379, db=1)
+r = redis.StrictRedis(host='localhost', port=21217, db=1)
+remote_redis = redis.StrictRedis(host='nyc.fanp.co', port=21217, db=2)
 
 # Example poke object
 # {"pokemon_id":"PIDGEY","lnglat":{"type":"Point","coordinates":[-73.99195579345653,40.73548518715059]},"encounter_id":"8900503607140605597","spawn_id":"89c25998605","expireAt":"2016-09-15T21:22:25.844+02:00"}
