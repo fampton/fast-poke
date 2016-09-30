@@ -101,6 +101,8 @@ def check_for_missing(mylist):
         r.set(i.encounter_id, i.coordinates)
         r.expire(i.encounter_id, poke_time_left(i))
     else:
+      if not remote_redis.exists(i.encounter_id):
+        remote_redis.set(i.encounter_id, i)
       pass
   return mypokelist
 
