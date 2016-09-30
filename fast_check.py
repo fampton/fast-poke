@@ -80,9 +80,9 @@ def list_nearby(mylist):
   sort_by = lambda x: x.pokemon_id
   xs = sorted(mylist, key=sort_by)
 
-  print 'Nearby Pokemon:'+'\n'
+  print('Nearby Pokemon:'+'\n')
   for value, group in itertools.groupby(xs, lambda x: x.pokemon_id):
-    print value, len(list(group))
+    print(value, len(list(group)))
 
 # check nearby pokemon for any that I do not have
 def check_for_missing(mylist):
@@ -125,7 +125,7 @@ def poke_time_left(mypokemon):
 def send_sms(poke_id, mypokemon, myexpiry):
   # should combine poke_id, mypokemon and myexpiry to be sourced from one object
   message = twilioCli.messages.create(body='{} at {} expiring at {}'.format(poke_id, gmap_url(mypokemon), myexpiry), from_=myTwilioNumber, to=myCellPhone)
-  print 'SMS sent'
+  print('SMS sent')
 
 #gapi response json
 #jq '.routes[0] .legs[0] .duration.value'
@@ -142,10 +142,10 @@ def main():
   mycheck = check_for_missing(mydata)
   for i in mycheck:
     if 'new' in i:
-      print 'Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4]
+      print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
       message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
     else:
-      print 'Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4]
+      print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
 
 if __name__ == '__main__':
 	main()
