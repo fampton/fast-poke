@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import iso8601
 import itertools
@@ -25,34 +26,20 @@ twilioCli = TwilioRestClient(accountSID, authToken)
 myTwilioNumber = config.myTwilioNumber
 myCellPhone = config.myCellPhone
 
-# work gps
-unsq = (40.735457, -73.991786)
+parser = argparse.ArgumentParser(description='Get notifications for given location.')
+parser.add_argument('-l', '--location', help='work, cps, or home', default='home')
+parser.add_argument('-n', '--notify', help='Send SMS for location.', action='store_true', default=False)
+args = parser.parse_args()
 
-# central park south gps
-cnt_park_s = (40.764924, -73.972988)
+loc_dict = {
+'work':(40.735457, -73.991786),
+'cps':(40.764924, -73.972988),
+'home':(40.702667, -73.919722)
+}
 
-# home gps
-bshwk_home = (40.702667, -73.919722)
-
-# This is super clunky I know, ultimately this app should rely on device gps
-# set mylat and mylong to be used in requests call
-# defaults to work gps
-if len(sys.argv) == 1:
-  mylat = unsq[0]
-  mylong = unsq[1]
-  myloc = 'work'
-elif sys.argv[1] == 'work':
-  mylat = unsq[0]
-  mylong = unsq[1]
-  myloc = 'work'
-elif sys.argv[1] == 'cps':
-  mylat = cnt_park_s[0]
-  mylong = cnt_park_s[1]
-  myloc = 'cps'
-elif sys.argv[1] == 'home':
-  mylat = bshwk_home[0]
-  mylong = bshwk_home[1]
-  myloc = 'home'
+myloc = args.location
+mylat = loc_dict[myloc][0]
+mylong = loc_dict[myloc][1]
 
 # list of missing pokemon as of 16Sep
 missing_poke = ph_missing.missing_poke
