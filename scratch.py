@@ -28,6 +28,7 @@ for i in r.keys():
     except:
         pass
 
+# function to get distance in miles from giving point to pokemon
 #for poke in mypokecoordinates[0:1000]:
 #    print(vincenty(poke, work).miles)
 
