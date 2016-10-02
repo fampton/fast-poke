@@ -28,7 +28,6 @@ myTwilioNumber = config.myTwilioNumber
 myCellPhone = config.myCellPhone
 
 parser = argparse.ArgumentParser(description='Get notifications for given location.')
-#parser.add_argument('-l', '--location', help='work, cps, or home', default='home')
 parser.add_argument('-n', '--notify', help='Send SMS for location.', action='store_true', default=False)
 args = parser.parse_args()
 
@@ -37,10 +36,6 @@ loc_dict = {
 'cps':(40.764924, -73.972988),
 'home':(40.702667, -73.919722)
 }
-
-#myloc = args.location
-#mylat = loc_dict[myloc][0]
-#mylong = loc_dict[myloc][1]
 
 # list of missing pokemon as of 16Sep
 missing_poke = ph_missing.missing_poke
