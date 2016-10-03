@@ -6,13 +6,15 @@ import iso8601
 import itertools
 import redis
 import sys
+import time
 
-# import api configs
+# import local configs
 import config
 import ph_missing
 import pokemap
 import pokedex
 import maps
+import notify
 
 from twilio.rest import TwilioRestClient
 
@@ -27,6 +29,8 @@ twilioCli = TwilioRestClient(accountSID, authToken)
 myTwilioNumber = config.myTwilioNumber
 myCellPhone = config.myCellPhone
 
+notify = notify.notify
+
 parser = argparse.ArgumentParser(description='Get notifications for given location.')
 parser.add_argument('-n', '--notify', help='Send SMS for location.', action='store_true', default=False)
 args = parser.parse_args()
@@ -34,7 +38,15 @@ args = parser.parse_args()
 loc_dict = {
 'work':(40.735457, -73.991786),
 'cps':(40.764924, -73.972988),
-'home':(40.702667, -73.919722)
+'home':(40.702667, -73.919722),
+'tmsq':(40.758732, -73.985217),
+'ppprk':(40.665995, -73.970354),
+'bbprk':(40.702729, -73.995815),
+'les':(40.719457, -73.987170),
+'uws':(40.785426, -73.975863),
+'ues':(40.775160, -73.951739),
+'hrlm':(40.806965, -73.948888),
+'hldtn':(40.724185, -74.007070),
 }
 
 # list of missing pokemon as of 16Sep
@@ -76,7 +88,8 @@ def check_for_missing(mylist, mylat, mylng):
   for i in mylist:
     # because missing poke list is by id and the data we get from fastpokemaps.se gives names we lookup number via mapping
     if pokedex[i.pokemon_id.title()] in missing_poke:
-      mydistance = get_walking_time(i)
+      #mydistance = get_walking_time(i)
+      mydistance = 'NA'
       # check redis to see if we have already seen this poke, so that we don't send sms for previous pokemon
       if r.exists(i.encounter_id):
         mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance))
@@ -88,6 +101,7 @@ def check_for_missing(mylist, mylat, mylng):
     else:
       if not remote_redis.exists(i.encounter_id):
         remote_redis.set(i.encounter_id, i)
+        remote_redis.execute_command('GEOADD', i.pokemon_id, i.coordinates[1], i.coordinates[0], i.encounter_id)
       pass
   return mypokelist
 
@@ -127,19 +141,24 @@ def get_walking_time(mypokemon):
 
 def main():
   for loc in loc_dict.keys():
-    mylat = loc_dict[loc][0]
-    mylong = loc_dict[loc][1]
-    mydata = get_data(mylat, mylong)
-    list_nearby(mydata)
-    mycheck = check_for_missing(mydata, mylat, mylong)
-    for i in mycheck:
-      if 'new' in i:
-        print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
-        if args.notify:
-          # replace this with a call to the send_sms() function
-          message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
-      else:
-        print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
+    try:
+      mylat = loc_dict[loc][0]
+      mylong = loc_dict[loc][1]
+      print loc, mylat, mylong
+      mydata = get_data(mylat, mylong)
+      list_nearby(mydata)
+      mycheck = check_for_missing(mydata, mylat, mylong)
+      for i in mycheck:
+        if 'new' in i:
+          print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
+          if notify != '':
+            # replace this with a call to the send_sms() function
+            message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
+        else:
+          print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
+      time.sleep(1)
+    except:
+      print 'error'
 
 if __name__ == '__main__':
 	main()

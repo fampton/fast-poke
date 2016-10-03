@@ -28,13 +28,12 @@ for i in r.keys():
     except:
         pass
 
-# function to get distance in miles from giving point to pokemon
-#for poke in mypokecoordinates[0:1000]:
-#    print(vincenty(poke, work).miles)
-
-workmap = folium.Map(location=list(work), zoom_start=13)
+ function to get distance in miles from giving point to pokemon
+for poke in mypokecoordinates[0:1000]:
+    print(vincenty(poke, work).miles)
 
 for i in mypokecoordinates[0:400]:
-        folium.Marker(list(i)).add_to(workmap)
+  folium.Marker(list(i)).add_to(workmap)
 
+#view this map at http://nyc.fanp.co
 workmap.save('/var/www/index.html')
