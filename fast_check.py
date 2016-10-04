@@ -10,6 +10,8 @@ import time
 
 # import local configs
 import config
+import desirable
+import ignore_these
 import maps
 import myloc
 import notify
@@ -30,6 +32,7 @@ twilioCli = TwilioRestClient(accountSID, authToken)
 myTwilioNumber = config.myTwilioNumber
 myCellPhone = config.myCellPhone
 
+ignore = ignore_these.ignore
 notify = notify.notify
 
 parser = argparse.ArgumentParser(description='Get notifications for given location.')
@@ -51,7 +54,7 @@ loc_dict = {
 }
 
 # list of missing pokemon as of 16Sep
-missing_poke = ph_missing.missing_poke
+missing_poke = list(set(ph_missing.missing_poke) | set(desirable.desirable))
 
 # Pokedex name/number map
 pokedex = pokedex.pokedex
@@ -81,7 +84,8 @@ def list_nearby(mylist):
 
   print('Nearby Pokemon:'+'\n')
   for value, group in itertools.groupby(xs, lambda x: x.pokemon_id):
-    print(value, len(list(group)))
+    if pokedex[value.title()] not in ignore:
+      print(value, len(list(group)))
 
 # check nearby pokemon for any that I do not have
 def check_for_missing(mylist, mylat, mylng):
@@ -149,16 +153,20 @@ def main():
       mylong = loc_dict[loc][1]
       print loc, mylat, mylong
       mydata = get_data(mylat, mylong)
-      list_nearby(mydata)
+      if notify == loc:
+        list_nearby(mydata)
       mycheck = check_for_missing(mydata, mylat, mylong)
       for i in mycheck:
-        if 'new' in i:
-          print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
-          # replace this with a call to the send_sms() function
-          if notify == loc:
-            message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
-        else:
-          print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
+        if i[3] > 0:
+          if 'new' in i:
+            #mydistance = get_walking_time(i)
+            print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
+            # replace this with a call to the send_sms() function
+            if notify == loc:
+              message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
+          else:
+            #mydistance = get_walking_time(i)
+            print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
       time.sleep(1)
     except:
       print 'error'
