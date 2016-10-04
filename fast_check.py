@@ -10,11 +10,12 @@ import time
 
 # import local configs
 import config
+import maps
+import myloc
+import notify
 import ph_missing
 import pokemap
 import pokedex
-import maps
-import notify
 
 from twilio.rest import TwilioRestClient
 
@@ -153,8 +154,8 @@ def main():
       for i in mycheck:
         if 'new' in i:
           print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
-          if notify != '':
-            # replace this with a call to the send_sms() function
+          # replace this with a call to the send_sms() function
+          if notify == loc:
             message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
         else:
           print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
