@@ -98,6 +98,8 @@ def check_for_missing(mylist, mylat, mylng):
         mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance, 'new'))
         r.set(i.encounter_id, i.coordinates)
         r.expire(i.encounter_id, poke_time_left(i))
+        remote_redis.set(i.encounter_id, i)
+        remote_redis.execute_command('GEOADD', i.pokemon_id, i.coordinates[1], i.coordinates[0], i.encounter_id)
     else:
       if not remote_redis.exists(i.encounter_id):
         remote_redis.set(i.encounter_id, i)
