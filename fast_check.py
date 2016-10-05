@@ -82,7 +82,7 @@ def list_nearby(mylist):
   sort_by = lambda x: x.pokemon_id
   xs = sorted(mylist, key=sort_by)
 
-  print('Nearby Pokemon:'+'\n')
+  print('Nearby filtered:')
   for value, group in itertools.groupby(xs, lambda x: x.pokemon_id):
     if pokedex[value.title()] not in ignore:
       print(value, len(list(group)))
@@ -97,10 +97,10 @@ def check_for_missing(mylist, mylat, mylng):
       mydistance = 'NA'
       # check redis to see if we have already seen this poke, so that we don't send sms for previous pokemon
       if r.exists(i.encounter_id):
-        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance))
+        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance, i.coordinates))
         pass
       else:
-        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance, 'new'))
+        mypokelist.append((i.pokemon_id, pokedex[i.pokemon_id.title()], gmap_url(i, mylat, mylng), poke_time_left(i), mydistance, i.coordinates, 'new'))
         r.set(i.encounter_id, i.coordinates)
         r.expire(i.encounter_id, poke_time_left(i))
         remote_redis.set(i.encounter_id, i)
@@ -139,9 +139,10 @@ def send_sms(poke_id, mypokemon, myexpiry):
 
 #gapi response json
 #jq '.routes[0] .legs[0] .duration.value'
+#broke this while trying to repurpose it
 def get_walking_time(mypokemon):
   maps_client = maps.Client(gapi_key)
-  coord = mypokemon.coordinates
+  coord = mypokemon[5]
   duration = maps_client.duration((mylat, mylong), (coord[1], coord[0]))
 
   return duration / 60
@@ -159,17 +160,16 @@ def main():
       for i in mycheck:
         if i[3] > 0:
           if 'new' in i:
-            #mydistance = get_walking_time(i)
             print('Found NEW one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
             # replace this with a call to the send_sms() function
             if notify == loc:
               message = twilioCli.messages.create(body='{} {} at {} expiring in {}, travel time {} min'.format(i[0], pokedex[i[0].title()], i[2], i[3], i[4]), from_=myTwilioNumber, to=myCellPhone)
           else:
-            #mydistance = get_walking_time(i)
             print('Found one!', i[0], pokedex[i[0].title()], i[2], 'expires in', i[3], 'seconds. Walking duration', i[4])
       time.sleep(1)
     except:
       print 'error'
+  print '\n'
 
 if __name__ == '__main__':
 	main()
