@@ -3,6 +3,8 @@ import requests
 import urllib
 import urlparse
 
+from fast_headers import key as mykey,ts,compute,proof
+
 ResultSet = collections.namedtuple("ResultSet", [
   "coordinates",
   "encounter_id",
@@ -27,12 +29,14 @@ def search_coord(lat, lng):
   url = list(urlparse.urlsplit("https://cache.fastpokemap.se/"))
 
   query_string = urllib.urlencode({
-    "key": "b4bcca55-94b3-4118-9c4b-412806bb6be4",
-    "ts": "476dae53",
-    "compute": "100.38.165.58",
-    "lat": ("%.6f" % lat),
-    "lng": ("%.6f" % lng),
-  })
+      "key": mykey,
+      "ts": ts,
+      "compute": compute,
+      "proof": proof,
+      "lat": ("%.6f" % lat),
+      "lng": ("%.6f" % lng),
+    }
+  )
 
   url[3] = query_string
   url    = urlparse.urlunsplit(url)
