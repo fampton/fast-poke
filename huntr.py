@@ -14,7 +14,7 @@ def poke_call():
   myresponse = myget.json()
   return myresponse
 
-if __name__ == '__main__':
+def dist_check():
   from geopy.distance import vincenty
   rare = []
   pdist = {}
@@ -34,4 +34,7 @@ if __name__ == '__main__':
   #for i in set(rare):
   #  print i, rare.count(i)#, str(pdist[i['pokemon_name']])
   for i in pdist.keys():
-    print i, '{:0.2f}'.format(pdist[i])
+    print i, '{:0.2f}'.format(pdist[i])+'m'
+
+if __name__ == '__main__':
+  dist_check()
