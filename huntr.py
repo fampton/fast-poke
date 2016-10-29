@@ -24,15 +24,12 @@ def dist_check():
     #if i['pokemon_rarity'] in ['Rare','Very Rare']:
     if i['pokemon_id'] not in ignore:
       distance = vincenty((orig_lat,orig_lng),(lat,lng)).miles
-      #print distance
       rare.append(i['pokemon_name'])
       if i['pokemon_name'] not in pdist.keys():
         pdist[i['pokemon_name']] = distance
       else:
         if distance < pdist[i['pokemon_name']]:
           pdist[i['pokemon_name']] = distance
-  #for i in set(rare):
-  #  print i, rare.count(i)#, str(pdist[i['pokemon_name']])
   for i in pdist.keys():
     print i, '{:0.2f}'.format(pdist[i])+'m'
 
