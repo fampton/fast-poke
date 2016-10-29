@@ -16,7 +16,7 @@ def poke_call():
 
 def dist_check():
   from geopy.distance import vincenty
-  rare = []
+  desirable = []
   pdist = {}
   for i in poke_call()['pokemons']:
     lng = i['longitude']
@@ -24,13 +24,14 @@ def dist_check():
     #if i['pokemon_rarity'] in ['Rare','Very Rare']:
     if i['pokemon_id'] not in ignore:
       distance = vincenty((orig_lat,orig_lng),(lat,lng)).miles
-      rare.append(i['pokemon_name'])
+      desirable.append(i['pokemon_name'])
       if i['pokemon_name'] not in pdist.keys():
         pdist[i['pokemon_name']] = distance
       else:
         if distance < pdist[i['pokemon_name']]:
           pdist[i['pokemon_name']] = distance
   for i in pdist.keys():
+    # truncate distance to two decimal places with 2f
     print i, '{:0.2f}'.format(pdist[i])+'m'
 
 if __name__ == '__main__':
