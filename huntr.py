@@ -26,13 +26,19 @@ def dist_check():
       distance = vincenty((orig_lat,orig_lng),(lat,lng)).miles
       desirable.append(i['pokemon_name'])
       if i['pokemon_name'] not in pdist.keys():
-        pdist[i['pokemon_name']] = distance
+        pdist[i['pokemon_name']] = {}
+        pdist[i['pokemon_name']]['distance'] = distance
+        pdist[i['pokemon_name']]['lat'] = lat
+        pdist[i['pokemon_name']]['lng'] = lng
       else:
         if distance < pdist[i['pokemon_name']]:
-          pdist[i['pokemon_name']] = distance
+          pdist[i['pokemon_name']]['distance'] = distance
+          pdist[i['pokemon_name']]['lat'] = lat
+          pdist[i['pokemon_name']]['lng'] = lng
   for i in pdist.keys():
     # truncate distance to two decimal places with 2f
-    print i, '{:0.2f}'.format(pdist[i])+'m'
+    print i, '{:0.2f}'.format(pdist[i]['distance'])+'m', 'http://www.google.com/maps/place/{},{}'.format(pdist[i]['lat'], pdist[i]['lng'])
+    # gmap url 'http://www.google.com/maps/place/{},{}'.format(mylat, mylng)
 
 if __name__ == '__main__':
   dist_check()
